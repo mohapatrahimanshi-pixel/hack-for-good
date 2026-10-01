@@ -1,0 +1,6 @@
+{
+  "name": "HACK FOR GOOD — NEXUS Tech Hackathon for NGOs",
+  "description": "Build Tech. Solve Problems. Create Impact. A high-energy problem-solving hackathon where developers, designers, and changemakers build real technology for NGOs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
