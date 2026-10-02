@@ -90,12 +90,12 @@ export const NexusLogo: React.FC<NexusLogoProps> = ({
         />
       </svg>
 
-      {/* Official Subtitle Rule: "A CN10XITER INITIATIVE" with flanking lines */}
+      {/* Official Subtitle Rule: "A CNX INITIATIVE" with flanking lines */}
       {showSubtitle && (
         <div className="w-full flex items-center justify-center gap-1.5 px-0.5 -mt-1">
           <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/30 to-white/60" />
-          <span className="text-[6.5px] sm:text-[7px] font-mono-code font-bold tracking-[0.2em] text-white/85 uppercase whitespace-nowrap">
-            A <span className="text-[#ff6e26] font-extrabold">CN10XITER</span> INITIATIVE
+          <span className="text-[6.5px] sm:text-[7px] font-mono-code font-bold tracking-[0.22em] text-white/85 uppercase whitespace-nowrap">
+            A <span className="text-[#ff6e26] font-extrabold">CNX</span> INITIATIVE
           </span>
           <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent via-white/30 to-white/60" />
         </div>
