@@ -16,6 +16,41 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
     seconds: 19
   });
 
+  // Performant compositor-only parallax scroll state
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    // Respect user's motion preferences
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+          // Only compute parallax while within the hero section height threshold
+          if (currentY <= 1400) {
+            setScrollY(currentY);
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Parallax offsets for distinct depth layers
+  const sunY = scrollY * 0.16;
+  const skylineY = scrollY * 0.22;
+  const midPalmsY = scrollY * 0.32;
+  const forePalmLeftY = scrollY * 0.44;
+  const forePalmRightY = scrollY * 0.40;
+  const cardY = -scrollY * 0.08;
+
   useEffect(() => {
     const targetDate = new Date('2026-11-14T10:00:00-05:00').getTime();
     const interval = setInterval(() => {
@@ -42,31 +77,67 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-[#130324] via-[#2d084e] via-45% to-[#ff3b82]/40" />
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-t from-[#0b0217] via-[#ff6838]/30 to-transparent" />
 
-        {/* Glowing Sun Orb & Horizon Ray Flares */}
-        <div className="absolute bottom-36 left-1/2 -translate-x-1/2 w-[340px] h-[340px] md:w-[500px] md:h-[500px] rounded-full bg-gradient-to-t from-[#ff0077] via-[#ff6838] to-[#ffbe3b] blur-xl opacity-75 shadow-[0_0_120px_rgba(255,104,56,0.6)]" />
+        {/* Glowing Sun Orb with subtle parallax depth */}
+        <div
+          style={{
+            transform: `translate3d(-50%, ${sunY}px, 0)`,
+            willChange: 'transform'
+          }}
+          className="absolute bottom-36 left-1/2 w-[340px] h-[340px] md:w-[500px] md:h-[500px] rounded-full bg-gradient-to-t from-[#ff0077] via-[#ff6838] to-[#ffbe3b] blur-xl opacity-75 shadow-[0_0_120px_rgba(255,104,56,0.6)]"
+        />
 
         {/* Halftone texture grid */}
         <div className="absolute inset-0 halftone-dots opacity-30" />
 
-        {/* City Skyline Silhouette */}
-        <div className="absolute bottom-0 left-0 right-0 h-48 md:h-64 text-[#0b0217]">
+        {/* City Skyline Silhouette with mid-layer parallax */}
+        <div
+          style={{
+            transform: `translate3d(0, ${skylineY}px, 0)`,
+            willChange: 'transform'
+          }}
+          className="absolute bottom-0 left-0 right-0 h-48 md:h-64 text-[#0b0217]"
+        >
           <CitySkylineSilhouette className="w-full h-full object-cover" />
         </div>
 
-        {/* Palm Tree Silhouettes: Left and Right Framing */}
-        <div className="absolute -bottom-10 -left-12 sm:-left-6 w-48 sm:w-72 md:w-88 text-[#070110] z-10 pointer-events-none transform -rotate-6">
-          <PalmSilhouette className="w-full h-auto drop-shadow-2xl" />
+        {/* Secondary distant palms with intermediate depth */}
+        <div
+          style={{
+            transform: `translate3d(0, ${midPalmsY}px, 0)`,
+            willChange: 'transform'
+          }}
+          className="hidden lg:block absolute bottom-12 left-1/4 w-36 text-[#170529]/80 pointer-events-none"
+        >
+          <PalmSilhouette className="w-full h-auto" />
         </div>
-        <div className="absolute -bottom-16 -right-14 sm:-right-8 w-56 sm:w-80 md:w-96 text-[#070110] z-10 pointer-events-none transform rotate-3">
-          <PalmSilhouette className="w-full h-auto drop-shadow-2xl" />
+        <div
+          style={{
+            transform: `translate3d(0, ${midPalmsY}px, 0) scaleX(-1)`,
+            willChange: 'transform'
+          }}
+          className="hidden lg:block absolute bottom-8 right-1/4 w-44 text-[#170529]/80 pointer-events-none"
+        >
+          <PalmSilhouette className="w-full h-auto" />
         </div>
 
-        {/* Secondary distant palms */}
-        <div className="hidden lg:block absolute bottom-12 left-1/4 w-36 text-[#170529]/80 pointer-events-none">
-          <PalmSilhouette className="w-full h-auto" />
+        {/* Foreground Palm Tree Silhouettes: Left and Right Framing */}
+        <div
+          style={{
+            transform: `translate3d(0, ${forePalmLeftY}px, 0) rotate(-6deg)`,
+            willChange: 'transform'
+          }}
+          className="absolute -bottom-10 -left-12 sm:-left-6 w-48 sm:w-72 md:w-88 text-[#070110] z-10 pointer-events-none"
+        >
+          <PalmSilhouette className="w-full h-auto drop-shadow-2xl" />
         </div>
-        <div className="hidden lg:block absolute bottom-8 right-1/4 w-44 text-[#170529]/80 pointer-events-none transform -scale-x-100">
-          <PalmSilhouette className="w-full h-auto" />
+        <div
+          style={{
+            transform: `translate3d(0, ${forePalmRightY}px, 0) rotate(3deg)`,
+            willChange: 'transform'
+          }}
+          className="absolute -bottom-16 -right-14 sm:-right-8 w-56 sm:w-80 md:w-96 text-[#070110] z-10 pointer-events-none"
+        >
+          <PalmSilhouette className="w-full h-auto drop-shadow-2xl" />
         </div>
 
         {/* Film grain noise */}
@@ -236,8 +307,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenRegister }) => {
               </div>
             </div>
 
-            {/* Editorial Polaroid Poster Collage */}
-            <div className="w-full max-w-sm relative">
+            {/* Editorial Polaroid Poster Collage with subtle counter-parallax float */}
+            <div
+              style={{
+                transform: `translate3d(0, ${cardY}px, 0)`,
+                willChange: 'transform'
+              }}
+              className="w-full max-w-sm relative"
+            >
               <div className="polaroid rounded-sm transform rotate-2 hover:rotate-0 transition-transform duration-300">
                 <TapeStrip className="-top-3 right-8" />
                 
